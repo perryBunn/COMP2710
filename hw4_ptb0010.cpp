@@ -18,12 +18,16 @@ using namespace std;
 const int MAX_SIZE = 100;
 
 // returns the size of the file "array"
-int readFileSize(int *inputArray[], ifstream &instream) {
+int readFileSize(char inputArray[], ifstream &instream) {
     int index = 0;
-    instream >> inputArray[index];
+    char temp;
+    instream >> temp;
+    inputArray[index] = (int)(temp);
+    cout << inputArray[index] << "\n";
     index++;
     while (!instream.eof()) {
         instream >> inputArray[++index];
+        cout << inputArray[index] << "\n";
     }
     return index;
 }
@@ -63,12 +67,12 @@ void heapify(int arr[], int n, int i)
 void heapSort(int arr[], int n)
 {
     // Build heap (rearrange array)
-    for (int i = n / 2 - 1; i >= 0; i--)
+    for (int i = n / 2 - 1; i >= 0; i--) {
         heapify(arr, n, i);
+    }
 
     // One by one extract an element from heap
-    for (int i=n-1; i>=0; i--)
-    {
+    for (int i=n-1; i>=0; i--) {
         // Move current root to end
         swap(arr[0], arr[i]);
 
@@ -88,7 +92,7 @@ int main() {
     cin >> fileName1;
     ifstream inStream1;
     inStream1.open((char*)fileName1.c_str());
-    int blank[MAX_SIZE];
+    char blank[MAX_SIZE];
     int index = readFileSize(blank, inStream1);
     inStream1.close();
     cout << "The list of " << index << " numbers in file input1.txt is:" << fileName1 << "\n";
