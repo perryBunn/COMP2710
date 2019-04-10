@@ -18,18 +18,24 @@ using namespace std;
 const int MAX_SIZE = 100;
 
 // returns the size of the file "array"
-int readFileSize(char inputArray[], ifstream &instream) {
+int readFileSize(int inputArray[], ifstream &instream) {
     int index = 0;
-    char temp;
-    instream >> temp;
-    inputArray[index] = (int)(temp);
-    cout << inputArray[index] << "\n";
-    index++;
-    while (!instream.eof()) {
-        instream >> inputArray[++index];
-        cout << inputArray[index] << "\n";
+    for (string line; getline(instream, line);index++){
+        inputArray[index] = stoi(line);
     }
     return index;
+
+    //    int index = 0;
+//    char temp;
+//    instream >> temp;
+//    inputArray[index] = (int)(temp);
+//    cout << inputArray[index] << "\n";
+//    index++;
+//    while (!instream.eof()) {
+//        instream >> inputArray[++index];
+//        cout << inputArray[index] << "\n";
+//    }
+//    return index;
 }
 
 
@@ -88,13 +94,32 @@ void writefile(int outputArray[], ifstream &outputArray_size) {
 int main() {
     cout << "*** Welcome to Perry Bunn's sorting program ***\n";
     cout << "Enter the first input file name:\t";
+
     string fileName1;
     cin >> fileName1;
     ifstream inStream1;
-    inStream1.open((char*)fileName1.c_str());
-    char blank[MAX_SIZE];
-    int index = readFileSize(blank, inStream1);
+    ifstream inStream2;
+    int array1[MAX_SIZE];
+    inStream1.open(fileName1);
+    int index1 = readFileSize(array1, inStream1);
     inStream1.close();
-    cout << "The list of " << index << " numbers in file input1.txt is:" << fileName1 << "\n";
+    cout << "The list of " << index1 << " numbers in file "<< fileName1 <<" is: " << "\n";
+    // print numbers here
+
+    cout << "Enter the second input file name:\t";
+    string fileName2;
+    cin >> fileName2;
+    int array2[MAX_SIZE];
+    inStream2.open(fileName2);
+    int index2 = readFileSize(array2, inStream2);
+    inStream2.close();
+    cout << "The list of " << index2 << " numbers in file "<< fileName2 <<" is: " << "\n";
+    // print numbers here
+
+    int sortedArray[MAX_SIZE];
+
+
+    cout << "The sorted list of "<< index1 + index2 << " numbers is: " << sortedArray;
+
     return 0;
 }
