@@ -8,6 +8,20 @@
 
 using namespace std;
 
+class String : public string {
+public:
+    String toLower();
+};
+
+String String::toLower() {
+    String compiled;
+    locale loc;
+    for (auto s : *this) {
+        compiled += tolower(s, loc);
+    }
+    return compiled;
+}
+
 template<class T>
 class Node {
 public:
@@ -43,18 +57,24 @@ public:
         prev = prevIn;
     }
 
-    string toString();
-    void print();
+    T getData1();
+    T getData2();
+    int getWeight();
 };
 
 template<class T>
-string Node<T>::toString() {
-    return std::__cxx11::string();
+T Node<T>::getData1() {
+    return this->data1;
 }
 
 template<class T>
-void Node<T>::print() {
-    cout << this->data;
+T Node<T>::getData2() {
+    return this->data2;
+}
+
+template<class T>
+int Node<T>::getWeight() {
+    return this->weight;
 }
 
 template<class T>
@@ -80,7 +100,6 @@ public:
     void append(Node<T> *node);
     void remove(T data);
     int size();
-    void toString();
 };
 
 template<class T>
@@ -116,6 +135,15 @@ void LinkedList<T>::insert(int index, Node<T> node){
 
 template<class T>
 void LinkedList<T>::append(Node<T> *node) {
+    if (this->size() == 0) {
+        this->head = node;
+        return;
+    }
+    if (this->size() == 1) {
+        this->tail = node;
+        this->head->next = node;
+        return;
+    }
     this->tail->next = node;
     node->prev = this->tail;
     this->tail = node;
@@ -146,30 +174,21 @@ int LinkedList<T>::size() {
     return count;
 }
 
-template<class T>
-void LinkedList<T>::toString() {
-    string print;
-    Node<T> *current = head;
-    while (current != nullptr) {
-        print += current->data1 + ", " + current->data2 + ", " + to_string(current->weight) + " -> ";
-    }
-    cout << print;
-}
-
 // Initialized the linked list for the program.
-LinkedList<string> init(LinkedList<string> list) {
-    Node<string> question1 = Node<string>("How long was the shortest war on record?", "38", 100);
-    Node<string> question2 = Node<string>("What was the Bank of America's original name? (Hint: Bank of Italy or Bank of Germany)", "Bank of Italy", 50);
-    Node<string> question3 = Node<string>("What is the best-selling video game of all time? (Hint: Minecraft or Tetris)", "Tetris", 20);
+void init(LinkedList<string> *list) {
 
-    list = LinkedList<string>(&question1);
-    list.append(&question2);
-    list.append(&question3);
-    return list;
+    Node<string> *question1 = new Node<string>("How long was the shortest war on record?", "38", 100);
+    Node<string> *question2 = new Node<string>("What was the Bank of America's original name? (Hint: Bank of Italy or Bank of Germany)", "Bank of Italy", 50);
+    Node<string> *question3 = new Node<string>("What is the best-selling video game of all time? (Hint: Minecraft or Tetris)", "Tetris", 20);
+
+    list->append(question1);
+    list->append(question2);
+    list->append(question3);
 }
 
 // Creates new questions to be added to the linked list
-void newQuestions(LinkedList<string> *list) {
+void newQuestions(LinkedList<string> listIn) {
+    LinkedList<string> *list = &listIn;
     bool playerConsent = true;
     while (playerConsent) {
         string question;
@@ -183,26 +202,57 @@ void newQuestions(LinkedList<string> *list) {
         cout << "Enter award points: ";
         cin >> weight;
 
-        Node<string> nodeQuest = Node<string>(question, answer, weight);
-        list->append(&nodeQuest);
+        Node<string> *nodeQuest = new Node<string>(question, answer, weight);
+        list->append(nodeQuest);
 
-        cout << "Countinue? (Yes/No): ";
-        string response = "";
+        cout << "Continue? (Yes/No): ";
+        String response;
         cin >> response;
-        if (response == "no") {
-            playerConsent = false;
-        }
+        response = response.toLower();
+        (response == "yes") ? (true):(playerConsent = false);
     }
+}
 
+// Iterates through the linked list checking if the correct responses have been made
+void askQuestions(LinkedList<string> listIn) {
+    LinkedList<string> *list = &listIn;
+    bool playerConsent = true;
+    Node<string> *current = list->head;
+    while (playerConsent) {
+        String qResponse;
+        int points = 0;
+        cout << "Question: " + current->data1 +"\n";
+        cout << "Answer: ";
+        cin >> qResponse;
+        if (qResponse == current->data2) {
+            cout << "Your answer is correct. You recieve " + to_string(current->weight) + " points.\n";
+            points += current->weight;
+            cout << "Your Total points: " + to_string(points) +"\n";
+        } else {
+            cout << "Your answer is wrong. The correct answer is: " + current->data2 +"\n";
+            cout << "Your Total points: " + to_string(points) +"\n";
+        }
+
+        if (current->next == nullptr) {
+            playerConsent = false;
+            return;
+        }
+        current = current->next;
+    }
 }
 
 int main() {
-    LinkedList<string> triviaList;
-    triviaList = init(triviaList);
-    cout << "*** Welcome to Perry's trivia quize game ***\n";
-    newQuestions(&triviaList);
-    cout << triviaList.tail->data1;
-    cout << triviaList.tail->data2;
-    cout << triviaList.tail->weight;
+    LinkedList<string> triviaList = LinkedList<string>();
+    init(&triviaList);
+    cout << "*** Welcome to Perry's trivia quiz game ***\n";
+    newQuestions(triviaList);
+//    cout << triviaList.head->getData1() + "\n";
+//    cout << triviaList.head->getData2() + "\n";
+//    cout << to_string(triviaList.head->getWeight()) + "\n";
+//    cout << triviaList.tail->getData1() + "\n";
+//    cout << triviaList.tail->getData2() + "\n";
+//    cout << to_string(triviaList.tail->getWeight()) + "\n";
+    askQuestions(triviaList);
+    cout << "*** Thank you for playing the trivia quiz game. Goodbye!";
     return 0;
 }
