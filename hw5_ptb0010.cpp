@@ -11,6 +11,7 @@ using namespace std;
 class String : public string {
 public:
     String toLower();
+    bool isEqual(const string& str);
 };
 
 String String::toLower() {
@@ -20,6 +21,10 @@ String String::toLower() {
         compiled += tolower(s, loc);
     }
     return compiled;
+}
+
+bool String::isEqual(const string& str) {
+    return (string) *this == str;
 }
 
 template<class T>
@@ -100,6 +105,8 @@ public:
     void append(Node<T> *node);
     void remove(T data);
     int size();
+    bool testQuestions(int numberOfQuestions);
+    bool testQuestions(int indexOfQuestion, string testResponse);
 };
 
 template<class T>
@@ -174,6 +181,23 @@ int LinkedList<T>::size() {
     return count;
 }
 
+template<class T>
+bool LinkedList<T>::testQuestions(int numberOfQuestions) {
+    if (numberOfQuestions <= 0) {
+        cout << "Warning - The number of trivia wo be asked bust be equal to or larger than 1";
+        return false;
+    }
+    for (int i = 0; i < this->size(); i++) {
+
+    }
+    return true;
+}
+
+template<class T>
+bool LinkedList<T>::testQuestions(int indexOfQuestion, string testResponse) {
+    return false;
+}
+
 // Initialized the linked list for the program.
 void init(LinkedList<string> *list) {
 
@@ -205,11 +229,16 @@ void newQuestions(LinkedList<string> listIn) {
         Node<string> *nodeQuest = new Node<string>(question, answer, weight);
         list->append(nodeQuest);
 
-        cout << "Continue? (Yes/No): ";
+        repeat: cout << "Continue? (Yes/No): ";
         String response;
         cin >> response;
         response = response.toLower();
-        (response == "yes") ? (true):(playerConsent = false);
+        if (response == "no") {
+            playerConsent = false;
+            cout << "\n";
+        } else if (response != "yes") {
+            goto repeat;
+        }
     }
 }
 
@@ -218,19 +247,21 @@ void askQuestions(LinkedList<string> listIn) {
     LinkedList<string> *list = &listIn;
     bool playerConsent = true;
     Node<string> *current = list->head;
+    int points = 0;
+    cin.ignore();
+    cin.sync();
     while (playerConsent) {
         String qResponse;
-        int points = 0;
         cout << "Question: " + current->data1 +"\n";
         cout << "Answer: ";
-        cin >> qResponse;
-        if (qResponse == current->data2) {
+        getline(cin, qResponse);
+        if (qResponse.isEqual(current->data2)) {
             cout << "Your answer is correct. You recieve " + to_string(current->weight) + " points.\n";
             points += current->weight;
-            cout << "Your Total points: " + to_string(points) +"\n";
+            cout << "Your Total points: " + to_string(points) +"\n\n";
         } else {
             cout << "Your answer is wrong. The correct answer is: " + current->data2 +"\n";
-            cout << "Your Total points: " + to_string(points) +"\n";
+            cout << "Your Total points: " + to_string(points) +"\n\n";
         }
 
         if (current->next == nullptr) {
@@ -241,18 +272,43 @@ void askQuestions(LinkedList<string> listIn) {
     }
 }
 
+// Test inti() for correct values.
+void unitTestingDriver() {
+    cout << "*** This is a debug version ***";
+    // call init
+    LinkedList<string> list = LinkedList<string>();
+    init(&list);
+    cout << "Unit Test Case 1: Ask no questions. The program should give a warning message.";
+    // test
+
+    cout << "Unit Test Case 2.1: Ask 1 question in the linked list. The tester enters teh incorrect answer.";
+    // test
+
+    cout << "Unit Test Case 2.2: Ask 1 question in the linked list. The tester enters the correct answer.";
+    // test
+
+    cout << "Unit Test Case 3: Ask the last trivia in the linked list.";
+    // test
+
+    cout << "Unit Test Case 4: Ask five questions in the linked list.";
+    // test
+
+    cout << "*** End of the Debug Version ***";
+}
+
+#ifdef UNIT_TESTING
+int main() {
+    unitTestingDriver();
+    return 0;
+}
+#else
 int main() {
     LinkedList<string> triviaList = LinkedList<string>();
     init(&triviaList);
     cout << "*** Welcome to Perry's trivia quiz game ***\n";
     newQuestions(triviaList);
-//    cout << triviaList.head->getData1() + "\n";
-//    cout << triviaList.head->getData2() + "\n";
-//    cout << to_string(triviaList.head->getWeight()) + "\n";
-//    cout << triviaList.tail->getData1() + "\n";
-//    cout << triviaList.tail->getData2() + "\n";
-//    cout << to_string(triviaList.tail->getWeight()) + "\n";
     askQuestions(triviaList);
     cout << "*** Thank you for playing the trivia quiz game. Goodbye!";
     return 0;
 }
+#endif
