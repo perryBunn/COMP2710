@@ -5,6 +5,7 @@
 // Help
 
 #include <iostream>
+#include <cassert>
 
 using namespace std;
 
@@ -243,10 +244,18 @@ void newQuestions(LinkedList<string> listIn) {
 }
 
 // Iterates through the linked list checking if the correct responses have been made
-void askQuestions(LinkedList<string> listIn) {
+void askQuestions(LinkedList<string> listIn, int number) {
     LinkedList<string> *list = &listIn;
+    if (number > list->size()){
+        cout << "Warning - There are only three trivia in the list.\n\n";
+        return;
+    }
     bool playerConsent = true;
     Node<string> *current = list->head;
+    if (current == nullptr) {
+        cout << "Warning - The number of trivia to be asked must equal to or larger than 1.\n\n";
+        return;
+    }
     int points = 0;
     cin.ignore();
     cin.sync();
@@ -274,27 +283,58 @@ void askQuestions(LinkedList<string> listIn) {
 
 // Test inti() for correct values.
 void unitTestingDriver() {
-    cout << "*** This is a debug version ***";
+    cout << "*** This is a debug version ***\n";
     // call init
     LinkedList<string> list = LinkedList<string>();
+    cout << "Unit Test Case 1: Ask no questions. The program should give a warning message.\n";
+    // test
+    askQuestions(list, 1);
+
     init(&list);
-    cout << "Unit Test Case 1: Ask no questions. The program should give a warning message.";
+    Node<string> *current = list.head;
+    cout << "Unit Test Case 2.1: Ask 1 question in the linked list. The tester enters the incorrect answer.\n";
     // test
+    cout << "Question: " + current->data1 +"\n";
+    cout << "Answer: ";
+    String qResponse;
+    getline(cin, qResponse);
+    assert(!qResponse.isEqual(current->data2));
+    cout << "Case 2.1 passed...\n";
 
-    cout << "Unit Test Case 2.1: Ask 1 question in the linked list. The tester enters teh incorrect answer.";
+    current = current->next->next;
+    cout << "\nUnit Test Case 2.2: Ask 1 question in the linked list. The tester enters the correct answer.\n";
     // test
+    cout << "Question: " + current->data1 +"\n";
+    cout << "Answer: ";
+    String qResponse2;
+    getline(cin, qResponse2);
+    assert(qResponse2.isEqual(current->data2));
+    cout << "Case 2.2 passed...\n";
 
-    cout << "Unit Test Case 2.2: Ask 1 question in the linked list. The tester enters the correct answer.";
+    current = list.tail;
+    cout << "\nUnit Test Case 3: Ask the last trivia in the linked list.\n";
     // test
+    cout << "Question: " + current->data1 +"\n";
+    cout << "Answer: ";
+    String qResponse3;
+    getline(cin, qResponse3);
+    assert(qResponse3.isEqual(current->data2));
 
-    cout << "Unit Test Case 3: Ask the last trivia in the linked list.";
+    cout << "\nUnit Test Case 4: Ask five questions in the linked list.\n";
     // test
-
-    cout << "Unit Test Case 4: Ask five questions in the linked list.";
-    // test
+    askQuestions(list, 5);
+    /* I did not design my code this way. In the description of the project it never said to specifically call a question
+     * or certain number of them. The way the code is written is to iterate until a nullptr for the next variable.
+     * Also the response we are to give indicates that the line is hard coded anyway; but using the word "three" instead
+     * of calling the size() and concatenating the number; I think doing so is bad coding practice (despite the way that ive written
+     * my test cases but I wouldnt really call this testing) but I wrote my code is such a way that it shouldnt fail in
+     * the ways that we are testing.
+     */
 
     cout << "*** End of the Debug Version ***";
 }
+
+// #define UNIT_TESTING = true;
 
 #ifdef UNIT_TESTING
 int main() {
@@ -307,7 +347,7 @@ int main() {
     init(&triviaList);
     cout << "*** Welcome to Perry's trivia quiz game ***\n";
     newQuestions(triviaList);
-    askQuestions(triviaList);
+    askQuestions(triviaList, 1);
     cout << "*** Thank you for playing the trivia quiz game. Goodbye!";
     return 0;
 }
